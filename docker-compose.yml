@@ -1,0 +1,67 @@
+# services:
+#   php-app:
+#   build: . 
+#   ports:
+#   - "8080:80"
+#   depends_on:
+#   - mysql-test
+
+# mysql:
+#     image: mysql:5.7
+# environment:
+#     MYSQL_DATABASE: todo_db
+#     MYSQL_ROOT_PASSWORD: P@ssw0rd
+#     ports:
+#     - "3306:3306"
+#     volumes:
+#     - dbdata:/var/lib/mysql
+
+# volumes:
+#   dbdata:
+# services:
+#   php-app:
+#     build: ./app
+#     ports:
+#       - "8080:80"
+#     depends_on:
+#       - mysql
+
+#   mysql:
+#     image: mysql:5.7
+#     environment:
+#       MYSQL_DATABASE: todo_db
+#       MYSQL_ROOT_PASSWORD: P@ssw0rd
+#     ports:
+#       - "3306:3306"
+#     volumes:
+#       - dbdata:/var/lib/mysql
+
+# volumes:
+#   dbdata:
+
+services:
+  php-app:
+    build: ./app
+    ports:
+      - "8080:80"
+    depends_on:
+      mysql: 
+        condition: service_healthy
+
+  mysql:
+    image: mysql:5.7
+    environment:
+      MYSQL_DATABASE: todo_db
+      MYSQL_ROOT_PASSWORD: P@ssw0rd
+    ports:
+      - "3306:3306"
+    volumes:
+      - dbdata:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-pP@ssw0rd"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  dbdata:
